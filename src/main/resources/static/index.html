@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<style>
+    .talk_con {
+        width: 600px;
+        height: 500px;
+        border: 1px solid #666;
+        margin: 50px auto 0;
+        background: #f9f9f9;
+    }
+
+    .talk_show {
+        width: 580px;
+        height: 420px;
+        border: 1px solid #666;
+        background: #fff;
+        margin: 10px auto 0;
+        overflow: auto;
+    }
+
+    .aTalk {
+        margin: 10px;
+        text-align: right;
+    }
+
+    .aTalk span {
+        display: inline-block;
+        background: #ef8201;
+        border-radius: 10px;
+        color: #fff;
+        padding: 5px 10px;
+    }
+
+    .bTalk {
+        margin: 10px;
+    }
+
+    .bTalk span {
+        display: inline-block;
+        background: #0181cc;
+        border-radius: 10px;
+        color: #fff;
+        padding: 5px 10px;
+    }
+
+    #text {
+        margin-left: 800px;
+    }
+
+    #name {
+        margin-left: 800px;
+    }
+</style>
+<body>
+<br/><br/>
+<div id="name"></div>
+<br/>
+<div class="talk_con">
+    <div class="talk_show" id="words">
+        <div class="aTalk"><span id="aSay"></span></div>
+        <div class="bTalk"><span id="bSay"></span></div>
+    </div>
+</div>
+<br/>
+<input id="text" type="text" aria-label=""/>
+<button onclick="send()"> Send</button>
+<button onclick="closeWebSocket()"> Close</button>
+
+<script type="text/javascript">
+    var url = location.search;
+    var name = url.split("=")[1];
+    document.getElementById("name").innerHTML = name;
+    // 判断当前浏览器是否支持WebSocket
+    if ('WebSocket' in window) {
+        websocket = new WebSocket("ws://localhost:4501/websocket/websocket/" + name);
+        console.log("link success")
+    } else {
+        alert('Not support websocket')
+    }
+
+    // 连接发生错误的回调方法
+    websocket.onerror = function () {
+        setMessageInnerHTML("error");
+    };
+
+    // 连接成功建立的回调方法
+    // noinspection JSUnusedLocalSymbols
+    websocket.onopen = function (event) {
+        setMessageInnerHTML("open");
+    };
+    console.log("-----");
+    // 接收到消息的回调方法
+    websocket.onmessage = function (event) {
+        setMessageInnerHTML(event.data);
+    };
+
+    // 连接关闭的回调方法
+    websocket.onclose = function () {
+        setMessageInnerHTML("close");
+    };
+
+    // 监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+    window.onbeforeunload = function () {
+        websocket.close();
+    };
+
+    // 将消息显示在网页上
+    function setMessageInnerHTML(innerHTML) {
+        var message = "";
+        if (innerHTML.split(":")[0] === document.getElementById('name').innerHTML) {
+            message = '<div class="aTalk"><span>' + innerHTML.split(":")[1] + '</span></div>';
+        } else {
+            message = '<div class="bTalk"><span>' + innerHTML + '</span></div>';
+        }
+        document.getElementById('words').innerHTML += message;
+    }
+
+    // 关闭连接
+    function closeWebSocket() {
+        websocket.close();
+    }
+
+    // 发送消息
+    function send() {
+        var message = document.getElementById('text').value;
+        websocket.send(message);
+    }
+</script>
+
+</body>
+</html>

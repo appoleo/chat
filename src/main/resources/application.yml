@@ -1,0 +1,12 @@
+server:
+  port: 4501
+  servlet:
+    context-path: /websocket
+
+spring:
+  mvc:
+    view:
+      prefix: classpath:/static/
+      suffix: .html
+  application:
+    name: websocket
