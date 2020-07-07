@@ -12,6 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
+ * WebSocket Server
+ *
  * @author wangchendong@innjoy.me
  */
 @Slf4j
@@ -19,8 +21,14 @@ import java.util.Map;
 @ServerEndpoint(value = "/{userId}")
 public class SocketService {
 
+    /**
+     * 连接的用户
+     */
     private String userId;
 
+    /**
+     * 保存用户的会话session
+     */
     private static final Map<String, Session> USERS = new LinkedHashMap<>();
 
     /**
@@ -47,12 +55,12 @@ public class SocketService {
     @OnMessage
     public void onMessage(String message, Session session) throws IOException {
         log.info("收到用户{}的消息：{}", this.userId, message);
-        // 回复用户
+        // 准备群发
         if (CollectionUtils.isEmpty(USERS)) {
             return;
         }
+        // 获取消息的发送者
         String id = session.getPathParameters().get("userId");
-
         for (Session sessionT : USERS.values()) {
             sessionT.getBasicRemote().sendText(id + ":" + message);
         }

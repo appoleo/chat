@@ -71,7 +71,7 @@
 <button onclick="closeWebSocket()"> Close</button>
 
 <script type="text/javascript">
-    var url = location.search;
+    var url = decodeURI(location.search);
     var name = url.split("=")[1];
     document.getElementById("name").innerHTML = name;
     // 判断当前浏览器是否支持WebSocket
