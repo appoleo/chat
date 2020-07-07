@@ -16,7 +16,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-@ServerEndpoint(value = "/websocket/{userId}")
+@ServerEndpoint(value = "/{userId}")
 public class SocketService {
 
     private String userId;
